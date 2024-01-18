@@ -1,5 +1,5 @@
-#Essa funcao e identica a funcao plsreg1 do pacote plsdepot com excessao da inversa generalizada
-#SANCHEZ ,2012
+#The function is identical to the function plsreg1 from the plsdepot package (Sanchez, 2023), except for the generalized inverse function MASS::ginv.
+#Sanchez G (2023). _plsdepot: Partial Least Squares (PLS) Data Analysis Methods_. Rpackage version 0.2.0, <https://CRAN.R-project.org/package=plsdepot>.
 
 plsreg1<-function (predictors, response, comps = 2, crosval = TRUE) 
 {
