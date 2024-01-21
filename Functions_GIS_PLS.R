@@ -535,6 +535,7 @@ covariates_analysis<-function(ggepls,rank,pred_names=NULL,resp_name=NULL){
     }
   }
   
+  g[[1]]
   return(list(ranking = df.best,
               frequency = sort(table(df.best$covariates),decreasing = T),
               cicles = g))
@@ -622,7 +623,7 @@ which_won_where<- function(raster,rm_gen=NULL,by_region=F,shapefile=NULL,regions
   
   #Fazendo quem vence onde para cara região
   
-  df.gen<-data.frame(Genotype = names(raster), guide =1:length(names(raster)) )
+  df.gen<-data.frame(Genotype = names(raster), genotype_code =1:length(names(raster)) )
   
   if(by_region==T){
     
@@ -640,7 +641,7 @@ which_won_where<- function(raster,rm_gen=NULL,by_region=F,shapefile=NULL,regions
       W<-map_cut(W,sh.reg)
       
       df.r<-data.frame(table(values(W))/sum(table(values(W))))
-      names(df.r)[1]<-"guide"
+      names(df.r)[1]<-"genotype_code"
       df.r<-merge(df.r,df.gen)
       df.r$region<- reg[i]
       
@@ -660,7 +661,7 @@ which_won_where<- function(raster,rm_gen=NULL,by_region=F,shapefile=NULL,regions
       #total
       if(i==length(reg)){
         df.rec<-data.frame(table(values(w))/sum(table(values(w))))
-        names(df.rec)[1]<-"guide"
+        names(df.rec)[1]<-"genotype_code"
         
         df.rec<-merge(df.rec,df.gen)
         
@@ -674,7 +675,7 @@ which_won_where<- function(raster,rm_gen=NULL,by_region=F,shapefile=NULL,regions
     
     w<-which.max(raster)
     df.rec<-data.frame(table(values(w))/sum(table(values(w))))
-    names(df.rec)[1]<-"guide"
+    names(df.rec)[1]<-"genotype_code"
     
     df.rec<-merge(df.rec,df.gen)
     
@@ -687,7 +688,7 @@ plot_recomendation<-function(w){
   
   w_pixel <- as(w$raster, "SpatialPixelsDataFrame")
   w_df <- as.data.frame(w_pixel)
-  colnames(w_df) <- c("guide", "x", "y")
+  colnames(w_df) <- c("genotype_code", "x", "y")
   
   w_df<-merge(w_df,w$general_recomendation)
   
@@ -696,4 +697,3 @@ plot_recomendation<-function(w){
   
   return(g)
 }
-
