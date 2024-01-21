@@ -87,7 +87,7 @@ getLonLat(raster = raster("./Covariates/r2.5min/wc2.1_2.5m_elev.tif"))
 e<-stack_rasters(path = "./Covariates/r2.5min/",pattern = ".tif")
 plot(e)
 
-br<-shapefile("./Shapefiles/BrasilWGS.shp") #importando o shapefile de molde
+br<-shapefile("BrasilWGS.shp") #importando o shapefile de molde
 e<-map_cut(e,br) #cortando todos os rasters
 plot(e)
 
@@ -174,7 +174,7 @@ names(e)
 names(e)[1:2]<-c("lat","lon") 
 
 coordinates(data) <- ~ lon + lat
-buf<-shapefile("./Shapefiles/Alvo_100km.shp")
+buf<-shapefile("Alvo_100km.shp")
 
 maps<-ggepls_map(ggepls = fit,stack = e);plot(maps) #Plotagem para toda a regiao dos rasters
 maps_cut<-ggepls_map(ggepls = fit,stack = e,cut=T,shapefile = buf);plot(maps_cut) #Plotagem com corte
