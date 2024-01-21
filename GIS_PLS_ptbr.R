@@ -1,6 +1,6 @@
 ###############################################################################
 #       Modelagem e Mapeamento de adaptabilidade de clones de eucalipto       #
-#                                  VersÃ£o 2.0                                #
+#                                  VersÃ£o 2.0  - PT BR                       #
 #                                                                             #
 # Elaborado por:Leonardo Oliveira Silva da Costa                              #
 #                                                                             #
@@ -15,7 +15,6 @@ library(ggplot2)
 library(gridExtra)
 library(dplyr)
 source("Functions_GIS_PLS.R")
-source("cov_group_selection.R")
 
 ############################################################################
 ####################                                  ######################
@@ -24,26 +23,22 @@ source("cov_group_selection.R")
 ####################                                  ######################
 ############################################################################
 
-inv<- read.csv("dados_inventario_filtrado.csv", header=T,sep=';');inv$id<-1:nrow(inv)
+inv<- read.csv("mai_set.csv", header=T,sep=';');inv$id<-1:nrow(inv)
 str(inv)
 
 #DATA/ANO
-inv$data_plantio<- as.Date(inv$data_plantio, "%d/%m/%Y")
-inv$data_medicao<- as.Date(inv$data_medicao, "%d/%m/%Y")
-inv$ANOi<- format(inv$data_plantio,"%Y")
-inv$ANOf<- format(inv$data_medicao,"%Y")
-inv$MESi<- format(inv$data_plantio,"%m")
-inv$MESf<- format(inv$data_medicao,"%m")
+inv$planting_date<- as.Date(inv$planting_date, "%d/%m/%Y")
+inv$year<- format(inv$planting_date,"%Y")
+inv$mon<- format(inv$planting_date,"%m")
 
 #SEMESTRE
 p<-paste0("0",1:6)
 s<-c(paste0("0",7:9),10:12)
 
-inv <- inv %>% mutate(SEMi = case_when(MESi %in% p ~ 1,MESi %in% s ~2),
-                      SEMf = case_when(MESf %in% p ~ 1,MESf %in% s ~2))
+inv <- inv %>% mutate(sem = case_when(mon %in% p ~ 1,mon %in% s ~2))
 
 #ANO.SEMESTRE
-inv$ANO.SEM<- paste(inv$ANOi, inv$SEMi, sep=".")
+inv$year.sem<- paste(inv$year, inv$sem, sep=".")
 
 ############################################################################
 #################### Associando cada valor de pixel aos dados ##############
@@ -66,18 +61,16 @@ pixel<- merge(data.frame(inv),pixel) #Juntando os dados de inventário e os dado
 
 #Médias a partir do quadrante e semestre
 
-(data<-pixel %>% group_by(MatGen_oficial, ID_Pixel,unf,ANO.SEM) %>% summarise( ima7cc = mean(ima7cc),
-                                                                              lat = mean(lat),
-                                                                              lon = mean(lon),
-                                                                              ANOi = mean(as.numeric(ANOi)),
-                                                                              SEMi = mean(SEMi),
-                                                                              idade = mean(idade_inv),
-                                                                              dataf= max(data_medicao),
-                                                                              datai= min(data_plantio),
-                                                                              alt = mean(altitude_raw)))
+(data<-pixel %>% group_by(gen, ID_Pixel,reg,year.sem) %>% summarise( mai = mean(mai),
+                                                                               lat = mean(lat),
+                                                                               lon = mean(lon),
+                                                                               year = mean(as.numeric(year)),
+                                                                               sem = mean(sem),
+                                                                               datai= min(planting_date)))
+
 nrow(data)
 
-write.table(data,"pixel_5m.csv",sep=';')
+write.table(data,"pixel_5m_toyset.csv",sep=';')
 ############################################################################
 ##################                                     #####################
 ####################        Tipagem ambiental        #######################
@@ -110,7 +103,7 @@ names(e)
 df.cov<-rastertype(stack = e[[3:26]], points = data) #Excluindo lat e lon 
 
 str(df.cov)
-write.table(df.cov,"Covariates_5mauto.csv",sep=';')
+write.table(df.cov,"Covariates_5m_toyset.csv",sep=';')
 
 ############################################################################
 ##################                                     #####################
@@ -118,18 +111,18 @@ write.table(df.cov,"Covariates_5mauto.csv",sep=';')
 #######################                          ###########################
 ############################################################################
 
-data<-read.csv("pixel_5m.csv",sep=';',header=T)
-df.cov<-read.csv("Covariates_5mauto.csv",sep=';',header=T)
+#data<-read.csv("pixel_5m_toyset.csv",sep=';',header=T)
+data_cov<-read.csv("Covariates_5m_toyset.csv",sep=';',header=T)
 
-data_cov<-cbind(data.frame(data),df.cov)
+#data_cov<-cbind(data.frame(data),df.cov)
 str(data_cov)
-str(data_cov[c(6:7,28:51)])
+str(data_cov[c(6:7,12:35)])
 
-config<-list(env="unf", genotype= "MatGen_oficial", pred = c(6:7,28:51), resp=5)
+config<-list(env="reg", genotype= "gen", pred = c(6:7,12:35), resp=5)
 
 fit<-fit_ggepls(dados = data_cov,
-                genotype = "MatGen_oficial",
-                env  = "unf",resp =5, pred = c(6:7,28:51))
+                genotype = "gen",
+                env  = "reg",resp =5, pred = c(6:7,12:35))
 #OU
 
 fit<-fit_ggepls(dados = data_cov,config = config)
@@ -161,11 +154,11 @@ loo$values
 #######################                          ###########################
 ############################################################################
 
-
-ca<-covariates_analysis(ggepls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",1:19),"ELEV"))
+fit$coef
+ca<-covariates_analysis(ggepls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",c(1,10:19,2:9)),"ELEV"))
 
 ca$ranking
-ca$cicles[[3]] #1 a n de genótipos
+ca$cicles[[4]] #1 a n de genótipos
 ca$frequency
 
 ############################################################################
@@ -174,8 +167,11 @@ ca$frequency
 #######################                          ###########################
 ############################################################################
 
+
+#Padronizando os nome do stack com os dos coeficientes
 fit$coef
-names(e)[1:2]<-c("lat","lon") # Padronizando os nome do stack com os dos coeficientes
+names(e)
+names(e)[1:2]<-c("lat","lon") 
 
 coordinates(data) <- ~ lon + lat
 buf<-shapefile("./Shapefiles/Alvo_100km.shp")
@@ -203,7 +199,7 @@ plot_recomendation(w)
 # Por regiao do shapefile br
 
 #Criar matriz de presenca dos clones por regiao
-(X<-get_X(data_cov,genotypes<-"MatGen_oficial", region<-'unf'))
+(X<-get_X(data_cov,genotypes<-"gen", region<-'reg'))
 
 #Recomendacao de clones dentre aqueles plantados em cada regiao
 w<-which_won_where(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regions = "unf",X = X)
@@ -211,8 +207,7 @@ w<-which_won_where(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regio
 w$general_recomendation
 w$region_recomendation
 
-#Plot com a legenda correta
+#Plot 
 (g<-plot_recomendation(w))
 plot(w$raster)
-w
 
