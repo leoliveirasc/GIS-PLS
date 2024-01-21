@@ -1,7 +1,7 @@
 ###############################################################################
 #       Modelagem e Mapeamento de adaptabilidade de clones de eucalipto       #
-#                                  VersÃ£o 2.0  - PT BR                       #
-#                                                                             #
+#                                  Versao 2.0  - PT BR                       #
+#                                                                              #
 # Elaborado por:Leonardo Oliveira Silva da Costa                              #
 #                                                                             #
 ###############################################################################
