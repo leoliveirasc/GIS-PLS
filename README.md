@@ -9,4 +9,4 @@ The provided data shows standardized predictions of the Mean Annual Increment (M
 ## Environmental data
 The GISPLS approach is a versatile tool that can handle various types of environmental data. Our pipeline consists of two functions, "get_WC" and "get_SG", which can quickly provide rasters from WorldClim and SoilGrids at four different spatial resolutions: 10 minutes, 5 minutes, 2.5 minutes, and 30 seconds.
 
-## Shapefiles
+
