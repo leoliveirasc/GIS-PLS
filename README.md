@@ -72,7 +72,7 @@ grid_point (raster,point)
 ### map_cut 
   map_cut(raster,shapefile)
 
-This function is merely the combination of the function crop and mask from raster package
+This function is simply a combination of the crop and mask functions from the raster package.
 ##### raster: raster to be cut
 ##### shapefile: template shapefile (or raster)
 
@@ -98,7 +98,7 @@ rm_genotype(raster,gen)
 ### stack_rasters
 stack_rasters (path,pattern)
 
-This function is merely the combination of the function list.files() from base raster() from raster package
+This function is simply a combination of the list.files() function from the base package and the raster() function from the raster package.
 
 ##### path: rasters files path
 ##### pattern: file name pattern
