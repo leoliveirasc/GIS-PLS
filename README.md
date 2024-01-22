@@ -1,4 +1,4 @@
-# GISPLS
+# GIS-PLS - a pipeline to model the GxE interaction with Partial Least Square Regression and to predict and map the productivity in new areas with Geographic Information Systems
 
 ## Welcome to GISPLS!
 The goal of this pipeline is to enhance the application of the GGEPLS approach to Geographic Information Systems (GIS) for predicting Genotype x Environment interaction (GxE). If you're interested, this repository contains the main script (GIS_PLS_en.R or GIS_PLS_ptbr.R) with all the necessary instructions to conduct the analysis using inventory data (production sites). The pipeline functions were designed to make the approach user-friendly, even for those without a strong background in GIS.
