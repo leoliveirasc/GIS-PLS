@@ -120,12 +120,12 @@ str(data_cov[c(6:7,12:35)])
 
 config<-list(env="reg", genotype= "gen", pred = c(6:7,12:35), resp=5)
 
-fit<-fit_ggepls(dados = data_cov,
+fit<-fit_ggepls(data = data_cov,
                 genotype = "gen",
                 env  = "reg",resp =5, pred = c(6:7,12:35))
 #OU
 
-fit<-fit_ggepls(dados = data_cov,config = config)
+fit<-fit_ggepls(data = data_cov,config = config)
 
 fit$metrics
 fit$values
