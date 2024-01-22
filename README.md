@@ -8,31 +8,33 @@ The provided data shows standardized predictions of the Mean Annual Increment (M
 
 ## Environmental data
 The GISPLS approach is a versatile tool that can handle various types of environmental data. In our pipeline, there are two functions, "get_WC" and "get_SG", which can quickly provide rasters from WorldClim and SoilGrids at four different spatial resolutions: 10 minutes, 5 minutes, 2.5 minutes, and 30 seconds. Please extract the files from "Functions_GISPLS.zip" and move them to the same location as the main script.
+
+
 ## Functions
 ### covariates_analysis
 covariates_analysis(ggepls,rank,pred_names=NULL,resp_name=NULL)
 
-##### ggepls: ggepls object obtained by ggepls_fit() function.
-##### rank: number of covariates that should be ranked
-##### pred_names : covariates personalized names
-##### resp_names: response variable name
+##### ggepls: is obtained by the ggepls_fit() function.
+##### rank: number of covariates that will be ranked.
+##### pred_names: covariates personalized names.
+##### resp_names: response variable name.
 
 ### fit_ggepls
 fit_ggepls (data,config=NULL,genotype=NULL, env=NULL,resp=NULL, pred=NULL,c=2)
 
-##### data: data frame containing the genotype and environmental information, such as response and covariates indexes
-##### config: shortcut list to set genotype, env, resp and pred
-##### genotype: genotype column name
-##### env: environment or regions column name
-##### resp: response variable index
-##### pred: covariates indexes
+##### data: data frame containing the genotype and environmental information, such as response and covariates indexes.
+##### config: shortcut list to set genotype, env, resp, and pred.
+##### genotype: genotype column name.
+##### env: environment or regions column name.
+##### resp: response variable index.
+##### pred: covariates indexes.
 
 ### get_X
 get_X(data,genotypes,region)
 
-##### data: data frame containing genotypes and regions information
-##### genotype: genotype column name
-##### region: environment or regions column name
+##### data: data frame containing genotypes and region information.
+##### genotype: genotype column name.
+##### region: environment or regions column name.
 
 ### getLonLat 
 getLonLat(raster)
@@ -41,10 +43,9 @@ getLonLat(raster)
 ### getSG
 getSG (attributes = NULL, layers ="30-60cm_mean", resample = F, raster=NULL,tr=c(4500,4500)
 
-##### attributes: soil attributes that should be downloaded. Options: bdod, cec, cfvo, clay, nitrogen
-, ocd, ocs, phh2o, sand, silt, soc, wrb. For more information access: https://www.isric.org/explore/soilgrids/faq-soilgrids
-##### layers: soil layers that sould be downloaded. Options: 0-5cm_mean, 5-15cm_mean, 15-30cm_mean, 30-60cm_mean, 60-100cm_mean, 100-200cm_mean. Its also possible download other quantiles, for example, 0-5cm_Q0.05, 0-5cm_Q0.5, 0-5cm_Q0.95, 0-5cm_uncertainty. For more information access: https://www.isric.org/explore/soilgrids/faq-soilgrids
-##### resample: Soilgrid rasters ares composed by the Homolosine projection. If TRUE you will need to provide a template raster with the desired DATUM, extended and special resolution.
+##### attributes: soil attributes that should be downloaded. Options: bdod, cec, cfvo, clay, nitrogen, ocd, ocs, phh2o, sand, silt, soc, wrb. For more information access: https://www.isric.org/explore/soilgrids/faq-soilgrids
+##### layers: soil layers that sould be downloaded. Options: 0-5cm_mean, 5-15cm_mean, 15-30cm_mean, 30-60cm_mean, 60-100cm_mean, 100-200cm_mean. It's also possible to download other quantiles, for example, 0-5cm_Q0.05, 0-5cm_Q0.5, 0-5cm_Q0.95, 0-5cm_uncertainty. For more information access: https://www.isric.org/explore/soilgrids/faq-soilgrids
+##### resample: Soilgrid rasters are composed by the Homolosine projection. If TRUE you will need to provide a template raster with the desired DATUM, extended, and special resolution.
 ##### raster: template raster.
 ##### tr: special resolution in meters required by rgdal to download Soilgrids rasters
 
@@ -52,7 +53,7 @@ getSG (attributes = NULL, layers ="30-60cm_mean", resample = F, raster=NULL,tr=c
 getWC(var=NULL,res=NULL)
 
 ##### var: climate variables that should be downloaded. Options: tmin, tmax, tavg, prec, srad, wind, vapr, bioc, elev.
-##### res: special resolution that rasters should be downloaded. Options: r10min, r5min, r2.5min, r30sec
+##### res: the spacial resolution that rasters should be downloaded. Options: r10min, r5min, r2.5min, r30sec
 
 
 ### ggepls_map
@@ -60,7 +61,7 @@ ggepls_map(ggepls, stack, cut = F,shapefile= NULL)
 
 ##### ggepls: ggepls object obtained by ggepls_fit() function.
 ##### stack: stack raster containing all covariates rasters
-##### cut: if TRUE you will need to provide a template shapefile where the rasters should be cutted
+##### cut: If TRUE, you will need to provide a shapefile template to cut the rasters.
 ##### shapefile: template shapefile
 
 ### grid_point
@@ -72,7 +73,7 @@ grid_point (raster,point)
   map_cut(raster,shapefile)
 
 This function is merely the combination of the function crop and mask from raster package
-##### raster: raster to be cutted
+##### raster: raster to be cut
 ##### shapefile: template shapefile (or raster)
 
 ### plot_recomendation
@@ -91,7 +92,7 @@ rastertype( stack,points,point_id=NULL)
 ### rm_genotype
 rm_genotype(raster,gen)
 
-##### raster: raster containing all mapped genotypes performance
+##### raster: raster containing all mapped genotype's performance
 ##### gen: genotype’s name to be removed
 
 ### stack_rasters
@@ -106,20 +107,20 @@ This function is merely the combination of the function list.files() from base r
 validation_ggepls (data,config=NULL,genotype=NULL,env=NULL,resp=NULL, pred=NULL,c=2,tendency= T)
 
 ##### data: data frame containing the genotype and environmental information, such as response and covariates indexes
-##### config: shortcut list to set genotype, env, resp and pred
+##### config: shortcut list to set genotype, env, resp, and pred
 ##### genotype: genotype column name
 ##### env: environment or regions column name
 ##### resp: response variable index
 ##### pred: covariates indexes
 ##### c: number of latent variables
-##### tendency: if TRUE an extra column with an errors classification will be created
+##### tendency: if TRUE an extra column with an error classification will be created
 
 ### which_won_where
   which_won_where(raster,rm_gen=NULL,by_region=F,shapefile=NULL,regions=NULL,X=NULL)
 
-##### raster: raster containing all mapped genotypes performance
+##### raster: raster containing all mapped genotype's performance
 ##### rm_gen: genotype’s name to be removed
-##### by_region: if TRUE the X matrix from get_X() function will be used to recomendate only genotypes tested by region
+##### by_region: if TRUE the X matrix from get_X() function will be used to compare only genotypes tested by region
 ##### shapefile: shapefile that contains region information
 ##### regions: attribute name in shapefile that identifies the regions
 ##### X: matrix from get_X()
