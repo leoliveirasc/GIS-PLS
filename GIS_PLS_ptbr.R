@@ -14,7 +14,7 @@ library(terra)
 library(ggplot2)
 library(gridExtra)
 library(dplyr)
-source("Functions_GIS_PLS.R")
+source("./Functions_GISPLS/Functions_GIS_PLS.R")
 
 ############################################################################
 ####################                                  ######################
@@ -56,17 +56,17 @@ coordinates(inv)<- ~ lon + lat
 plot(inv,add=T)
 
 #Obtendo os pontos de cada grid
-pixel<-grid_point(raster = raster, point = inv)
+pixel<-gridPoint(raster = raster, point = inv)
 pixel<- merge(data.frame(inv),pixel) #Juntando os dados de inventário e os dados 
 
 #Médias a partir do quadrante e semestre
 
 (data<-pixel %>% group_by(gen, ID_Pixel,reg,year.sem) %>% summarise( mai = mean(mai),
-                                                                               lat = mean(lat),
-                                                                               lon = mean(lon),
-                                                                               year = mean(as.numeric(year)),
-                                                                               sem = mean(sem),
-                                                                               datai= min(planting_date)))
+                                                                     lat = mean(lat),
+                                                                     lon = mean(lon),
+                                                                     year = mean(as.numeric(year)),
+                                                                     sem = mean(sem),
+                                                                     datai= min(planting_date)))
 
 nrow(data)
 
@@ -84,11 +84,11 @@ getSG(attributes = c("bdod","clay","sand","cec"),resample = T,raster =raster("./
 getLonLat(raster = raster("./Covariates/r2.5min/wc2.1_2.5m_elev.tif"))
 
 #Cortando os rasters para a area de interesse
-e<-stack_rasters(path = "./Covariates/r2.5min/",pattern = ".tif")
+e<-stackRasters(path = "./Covariates/r2.5min/",pattern = ".tif")
 plot(e)
 
-br<-shapefile("BrasilWGS.shp") #importando o shapefile de molde
-e<-map_cut(e,br) #cortando todos os rasters
+br<-shapefile("./Shapefiles/BrasilWGS.shp") #importando o shapefile de molde
+e<-mapCut(e,br) #cortando todos os rasters
 plot(e)
 
 #Salvando o stack
@@ -120,12 +120,12 @@ str(data_cov[c(6:7,12:35)])
 
 config<-list(env="reg", genotype= "gen", pred = c(6:7,12:35), resp=5)
 
-fit<-fit_ggepls(data = data_cov,
+fit<-fitGISPLS(data = data_cov,
                 genotype = "gen",
                 env  = "reg",resp =5, pred = c(6:7,12:35))
 #OU
 
-fit<-fit_ggepls(data = data_cov,config = config)
+fit<-fitGISPLS(data = data_cov,config = config)
 
 fit$metrics
 fit$values
@@ -143,7 +143,7 @@ fit$genotypes
 #######################                          ###########################
 ############################################################################
 
-loo<-validation_ggepls(data_cov,config = config)
+loo<-validateGISPLS(data_cov,config = config)
 
 loo$metrics
 loo$values
@@ -155,7 +155,7 @@ loo$values
 ############################################################################
 
 fit$coef
-ca<-covariates_analysis(ggepls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",c(1,10:19,2:9)),"ELEV"))
+ca<-covariatesAnalysis(gispls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",c(1,10:19,2:9)),"ELEV"))
 
 ca$ranking
 ca$cicles[[4]] #1 a n de genótipos
@@ -174,13 +174,13 @@ names(e)
 names(e)[1:2]<-c("lat","lon") 
 
 coordinates(data) <- ~ lon + lat
-buf<-shapefile("Alvo_100km.shp")
+buf<-shapefile("./Shapefiles/Alvo_100km.shp")
 
-maps<-ggepls_map(ggepls = fit,stack = e);plot(maps) #Plotagem para toda a regiao dos rasters
-maps_cut<-ggepls_map(ggepls = fit,stack = e,cut=T,shapefile = buf);plot(maps_cut) #Plotagem com corte
+maps<-mapGISPLS(gispls = fit,stack = e);plot(maps) #Plotagem para toda a regiao dos rasters
+maps_cut<-mapGISPLS(gispls = fit,stack = e,cut=T,shapefile = buf);plot(maps_cut) #Plotagem com corte
 
 #tbm eh possivel cortar depois sem a opcao cut, utilizando a funcao separada
-maps_cut2<-map_cut(maps,buf)
+maps_cut2<-mapCut(maps,buf)
 plot(maps_cut2)
 
 ############################################################################
@@ -189,25 +189,23 @@ plot(maps_cut2)
 #######################                          ###########################
 ############################################################################
 
-##wich won where sem restricoes
-w<-which_won_where(maps)
-
-plot_recomendation(w)
+##Quem vence onde sem restricoes
+w<-whichWonWhere(maps)
+recommendationPlot(w)
 
 #wich won where:
 # retirando clone CLZ003
 # Por regiao do shapefile br
 
 #Criar matriz de presenca dos clones por regiao
-(X<-get_X(data_cov,genotypes<-"gen", region<-'reg'))
+(X<-getX(data_cov,genotypes<-"gen", region<-'reg'))
 
 #Recomendacao de clones dentre aqueles plantados em cada regiao
-w<-which_won_where(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regions = "unf",X = X)
+w<-whichWonWhere(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regions = "unf",X = X)
 
 w$general_recomendation
 w$region_recomendation
 
 #Plot 
-(g<-plot_recomendation(w))
+(g<-recommendationPlot(w))
 plot(w$raster)
-
