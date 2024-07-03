@@ -2,7 +2,7 @@
 #       Modeling and Mapping Adaptability of Eucalyptus Clones                #
 #                           version 2.0  - English                            #
 #                                                                             #
-# Elaborado por:Leonardo Oliveira Silva da Costa                              #
+# Author:Leonardo Oliveira Silva da Costa                                     #
 #                                                                             #
 ###############################################################################
 
@@ -14,7 +14,7 @@ library(terra)
 library(ggplot2)
 library(gridExtra)
 library(dplyr)
-source("Functions_GIS_PLS.R")
+source("./Functions_GISPLS/Functions_GIS_PLS.R")
 
 ############################################################################
 ####################                                  ######################
@@ -44,7 +44,7 @@ inv$year.sem<- paste(inv$year, inv$sem, sep=".")
 ####################  Associating Each Pixel Value with Data  ##############
 ############################################################################
 
-# Downloading 5-minute raster for a 10 km² grid template
+# Downloading 5-minute raster for a 10 kmÂ² grid template
 getWC(var="elev",res="r5min") #Molde de 5 minutos
 
 #Importando raster molde
@@ -56,7 +56,7 @@ coordinates(inv)<- ~ lon + lat
 plot(inv,add=T)
 
 # Obtaining points for each grid
-pixel<-grid_point(raster = raster, point = inv)
+pixel<-gridPoint(raster = raster, point = inv)
 pixel<- merge(data.frame(inv),pixel) # Merging inventory data and pixel data
 
 
@@ -80,16 +80,16 @@ write.table(data,"pixel_5m_toyset.csv",sep=';')
 
 #Download rasters
 
-getWC(var=c("bioc","elev"), res="r2.5min") #WorldClim (Biovars e Elevation)
+getWC(var=c("elev","bioc"), res="r2.5min") #WorldClim (Biovars e Elevation)
 getSG(attributes = c("bdod","clay","sand","cec"),resample = T,raster =raster("./Covariates/r2.5min/wc2.1_2.5m_elev.tif") )
 getLonLat(raster = raster("./Covariates/r2.5min/wc2.1_2.5m_elev.tif"))
 
 # Cutting the rasters for the area of interest
-e<-stack_rasters(path = "./Covariates/r2.5min/",pattern = ".tif")
+e<-stackRasters(path = "./Covariates/r2.5min/",pattern = ".tif")
 plot(e)
 
-br<-shapefile("BrasilWGS.shp") # Importing the template shapefile
-e<-map_cut(e,br) # Cutting all the rasters
+br<-shapefile("./Shapefiles/BrasilWGS.shp") # Importing the template shapefile
+e<-mapCut(e,br) # Cutting all the rasters
 plot(e)
 
 # Saving the stack
@@ -119,12 +119,12 @@ str(data_cov[c(6:7,12:35)])
 
 config<-list(env="reg", genotype= "gen", pred = c(6:7,12:35), resp=5)
 
-fit<-fit_ggepls(data = data_cov,
+fit<-fitGISPLS(data = data_cov,
                 genotype = "gen",
                 env  = "reg",resp =5, pred = c(6:7,12:35))
 #or
 
-fit<-fit_ggepls(data = data_cov,config = config)
+fit<-fitGISPLS(data = data_cov,config = config)
 
 fit$metrics
 fit$values
@@ -142,7 +142,7 @@ fit$genotypes
 #######################                          ###########################
 ############################################################################
 
-loo<-validation_ggepls(data_cov,config = config)
+loo<-validateGISPLS(data_cov,config = config)
 
 loo$metrics
 loo$values
@@ -154,10 +154,10 @@ loo$values
 ############################################################################
 
 fit$coef
-ca<-covariates_analysis(ggepls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",c(1,10:19,2:9)),"ELEV"))
+ca<-covariatesAnalysis(gispls = fit, rank=5,resp_name = "MAI",pred_names=c("LATI","LONG","BDOD","CEC","CLAY","SAND",paste0("BIO",c(1,10:19,2:9)),"ELEV"))
 
 ca$ranking
-ca$cicles[[4]] #1 to genotype number
+ca$cicles[[1]] #1 to genotype number
 ca$frequency
 
 ############################################################################
@@ -173,13 +173,13 @@ names(e)
 names(e)[1:2]<-c("lat","lon") 
 
 coordinates(data) <- ~ lon + lat
-buf<-shapefile("Alvo_100km.shp")
+buf<-shapefile("./Shapefiles/Alvo_100km.shp")
 
-maps<-ggepls_map(ggepls = fit,stack = e);plot(maps) # Plotting for the entire region of the rasters
-maps_cut<-ggepls_map(ggepls = fit,stack = e,cut=T,shapefile = buf);plot(maps_cut)  # Plotting after cutting
+maps<-mapGISPLS(gispls = fit,stack = e);plot(maps) # Plotting for the entire region of the rasters
+maps_cut<-mapGISPLS(gispls = fit,stack = e,cut=T,shapefile = buf);plot(maps_cut)  # Plotting after cutting
 
 # It's also possible to cut later without the cut option, using the separate function
-maps_cut2<-map_cut(maps,buf)
+maps_cut2<-mapCut(maps,buf)
 plot(maps_cut2)
 
 ############################################################################
@@ -189,24 +189,24 @@ plot(maps_cut2)
 ############################################################################
 
 # Which won where without restrictions
-w<-which_won_where(maps)
+w<-whichWonWhere(maps)
 
-plot_recomendation(w)
+recommendationPlot(w)
 
 # Which won where:
 # Removing clone CLZ003
 # By region of the shapefile "buf"
 
 # Create a matrix of clone presence by region
-(X<-get_X(data_cov,genotypes<-"gen", region<-'reg'))
+(X<-getX(data_cov,genotypes<-"gen", region<-'reg'))
 
 # Clone recommendation among those planted in each region
-w<-which_won_where(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regions = "unf",X = X)
+w<-whichWonWhere(maps,rm_gen = c("CLZ003"),by_region = T,shapefile = buf,regions = "unf",X = X)
 
 w$general_recomendation
 w$region_recomendation
 
 #Plot 
-(g<-plot_recomendation(w))
+(g<-recommendationPlot(w))
 plot(w$raster)
 
