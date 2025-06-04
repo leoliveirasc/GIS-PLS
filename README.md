@@ -125,6 +125,10 @@ validateGISPLS (data,config=NULL,genotype=NULL,env=NULL,resp=NULL, pred=NULL,c=2
 ##### X: matrix from get_X()
 
 
+#References
+da Costa, L.O.S., de Souza, I.C.G., Fernandes, A.C.M. et al. Prediction and mapping the productivity of eucalyptus clones with environmental covariates. Tree Genetics & Genomes 20, 23 (2024). https://doi.org/10.1007/s11295-024-01656-8
+
+
 
 
 
